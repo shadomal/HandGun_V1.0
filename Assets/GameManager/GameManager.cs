@@ -1,26 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.AI;
-public class GameManager : ScriptBattleSystemTeste
+public class GameManager : SpawnPlayer
 {
-
-    public enum STATE_GAME
-    {
-        INITIALIZING, //Carregar todas as infos;
-        START_TURN, //Inicia primeiro turno
-        PLAYER_TURN, // TURNO PLAYER
-        ENEMY_TURN, // TURNO INIMIGO
-        STOP_TURN, // Para o turno
-        REBOOTING, // ATUALIZAR A CENA(CONTADORES - PONTUAÇÃO, TURNOS RESTANTES - TEMPO, STAMINA E VIDA) 
-        WIN,
-        LOSE
-    }
-
-    [Header("Jogadores Vars")]
 
     [Header("Turno Vars")]
     public int turnos;
@@ -30,7 +15,6 @@ public class GameManager : ScriptBattleSystemTeste
     public static bool isPlayerAction, isEnemyAction;
     public float turnoTimer = 0;
     public bool isRunning = true;
-    [Header("STATUS_ACTUALLY")]
     private STATE_GAME stateGame;
     [Header("INTERFACE ATRIBUTS")]
     public Text playerPoints_txt, turnos_txt, enemyPoints_txt;
@@ -40,8 +24,6 @@ public class GameManager : ScriptBattleSystemTeste
     public Text winner_txt;
     public GameObject winUI;
     [Header("PLAYER ATRIBUTS")]
-
-
     private int playerLife, playerMaxLife, playerStamina;
 
     [Header("ENEMY ATRIBUTS")]
@@ -50,12 +32,92 @@ public class GameManager : ScriptBattleSystemTeste
 
     [Header("JOGADORES - ")]
     private GameObject player, enemy;
+
+    [Header("DICE CONTROLLER")]
+    public static int dice_1, dice_2;
+    public static bool buttonReady_1, buttonReady_2;
+    public Button Button_one, Button_two;
+    public Text uiButtonText;
+    public Text uiButtonText_two;
+    public Text TimeToStart_txt;
+    public Text enemyDice, playerDice;
+    public GameObject UI_INICIALIZING_GAME;
+    public GameObject UI_InGame;
+    public GameObject CAM_INICIALIZE;
+    public float timeToStart;
+    public bool startCount;
     void Awake()
     {
         this.turnos = 0;
         this.turnoTimer = 60f; //segundos
-        stateGame = STATE_GAME.INITIALIZING;
-        SetupBattle();
+
+
+        buttonReady_1 = false;
+        buttonReady_2 = false;
+        timeToStart = 5;
+        SetStateGame(STATE_GAME.INITIALIZING);
+        Button_one.onClick = new Button.ButtonClickedEvent();
+        Button_one.onClick.AddListener(() =>
+        {
+            buttonReady_1 = !buttonReady_1;
+            uiButtonText_two.text = buttonReady_1 ? "READY" : "UNREADY";
+            CheckCanStart();
+        });
+        Button_two.onClick = new Button.ButtonClickedEvent();
+        Button_two.onClick.AddListener(() =>
+        {
+            buttonReady_2 = !buttonReady_2;
+            uiButtonText.text = buttonReady_2 ? "READY" : "UNREADY";
+            CheckCanStart();
+        });
+    }
+    public void CheckCanStart()
+    {
+        if (GetStateGame() == STATE_GAME.INITIALIZING)
+        {
+            if (buttonReady_1 == true && buttonReady_2 == true)
+            {
+                RollingDices();
+            }
+        }
+    }
+    public void RollingDices()
+    {
+        dice_1 = Random.Range(0, 20);
+        dice_2 = Random.Range(0, 20);
+        Debug.Log("Rolling Dices this result is: " + dice_1 + " | " + dice_2);
+        if (dice_1 == dice_2)
+        {
+            RollingDices();
+            Debug.Log("Rolling new dices this result is: " + dice_1 + " | " + dice_2);
+            return;
+        }
+        playerDice.text = System.Convert.ToString(dice_1);
+        enemyDice.text = System.Convert.ToString(dice_2);
+        startCount = true;
+    }
+
+    public void Count()
+    {
+        if (startCount)
+        {
+            timeToStart -= Time.deltaTime;
+            TimeToStart_txt.text = timeToStart.ToString("0");
+            if (timeToStart <= 0)
+            {
+                startCount = false;
+                SetStateGame(STATE_GAME.START_TURN);
+                if (GetStateGame() == STATE_GAME.START_TURN)
+                {
+                    UI_INICIALIZING_GAME.SetActive(false);
+                    UI_InGame.SetActive(true);
+                    CAM_INICIALIZE.SetActive(false);
+                    SetupBattle();
+                    return;
+                }
+            }
+            return;
+        }
     }
     public void SetupBattle()
     {
@@ -68,19 +130,13 @@ public class GameManager : ScriptBattleSystemTeste
     {
         //Jogador
         userName_txt.text = "Lost";
-        playerLife = player.gameObject.GetComponent<PlayerController>().GetLife();
-        playerStamina = player.gameObject.GetComponent<PlayerController>().GetStamina();
         //Inimigo
         enemyName_txt.text = enemy.gameObject.GetComponent<Unit>().userName;
-        enemyLife = enemy.gameObject.GetComponent<enemyConfig>().GetLife();
-        enemyStamina = enemy.gameObject.GetComponent<enemyConfig>().GetStamina();
 
         //Mudança de estado
         SetStateGame(STATE_GAME.START_TURN);
         InitTurn();
     }
-    public STATE_GAME GetStateGame() => this.stateGame;
-    public void SetStateGame(STATE_GAME state) => this.stateGame = state;
     public void InitTurn()
     {
         Debug.Log("STATE -  " + stateGame);
@@ -106,14 +162,7 @@ public class GameManager : ScriptBattleSystemTeste
             }
         }
     }
-    void Update()
-    {
-        CountTime();
-        if (Input.GetKey(KeyCode.K))
-        {
-            SkipTurn();
-        }
-    }
+
     public void PlayerTurn()
     {
         if (this.GetStateGame() == STATE_GAME.PLAYER_TURN)
@@ -121,7 +170,7 @@ public class GameManager : ScriptBattleSystemTeste
             PlayerController playerController = player.gameObject.GetComponent<PlayerController>();
             if (playerController != null)
             {
-               playerController.enabled = true;
+                playerController.enabled = true;
             }
         }
     }
@@ -214,8 +263,8 @@ public class GameManager : ScriptBattleSystemTeste
 
     public void WinCondition()
     {
-        playerPontuacao = Convert.ToInt32(playerPoints_txt);
-        enemyPontuacao = Convert.ToInt32(enemyPoints_txt);
+        playerPontuacao = System.Convert.ToInt32(playerPoints_txt);
+        enemyPontuacao = System.Convert.ToInt32(enemyPoints_txt);
         playerPontuacao = 3;
         if (playerPontuacao == 3)
         {
@@ -232,6 +281,15 @@ public class GameManager : ScriptBattleSystemTeste
             win_img.fillAmount += Time.deltaTime;
         }
     }
+    void Update()
+    {
+        Count();
+        CountTime();
+        if (Input.GetKey(KeyCode.K))
+        {
+            SkipTurn();
+        }
+    }
     public void SkipTurn()
     {
         this.turnoTimer -= 20;
@@ -239,9 +297,5 @@ public class GameManager : ScriptBattleSystemTeste
     public void TryAgain()
     {
         SceneManager.LoadScene("MapaBlocagem");
-    }
-    public void CloseGame()
-    {
-        Application.Quit();
     }
 }

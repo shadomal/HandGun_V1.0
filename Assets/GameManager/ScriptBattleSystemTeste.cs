@@ -5,12 +5,15 @@ using UnityEngine.UI;
 
 public class ScriptBattleSystemTeste : MonoBehaviour
 {
-    public GameObject playerPrefab;
+
+    //SCRIPT DESABILITADO 
+    
+    /*public GameObject playerPrefab;
     public GameObject enemyPrefab;
     private Vector3 mapCenter;
     //public GAMESTATE state;
 
-    #region INICIALIZE
+    #region INICIALIZE_TURN
     public void SetupSpawn()
     {
         Instantiate(playerPrefab, GetRandomLocation(), new Quaternion(0, 0, 0, 0));
@@ -42,7 +45,7 @@ public class ScriptBattleSystemTeste : MonoBehaviour
     /*public int getSafeY(Vector3 location)
     {
         return false;
-    }*/
+    }
     public bool IsSafeLocation(Vector3 location)
     {
         List<GameObject> nearby = GetNearbyObjects(location, 10);
@@ -97,4 +100,5 @@ public class ScriptBattleSystemTeste : MonoBehaviour
         return nearby;
     }
     #endregion
+    */
 }

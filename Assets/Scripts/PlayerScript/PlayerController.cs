@@ -40,8 +40,8 @@ public class PlayerController : MonoBehaviour
         maxLife_ = 250;
         speed = 20;
         rigidPlayer = GetComponent<Rigidbody>();
-        stamina = 250;
-        maxStamina = 350;
+        stamina = 1000;
+        maxStamina = 10000;
         StaminaCost = 0.8f;
         SightAnimation = GetComponent<Animator>();
         animator = GetComponent<Animator>();
