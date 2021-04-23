@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.AI;
+using Cinemachine;
 public class GameManager : SpawnPlayer
 {
 
@@ -47,6 +48,8 @@ public class GameManager : SpawnPlayer
     public GameObject CAM_INICIALIZE;
     public float timeToStart;
     public bool startCount;
+
+
     void Awake()
     {
         this.turnos = 0;

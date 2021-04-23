@@ -254,7 +254,6 @@ public class PlayerController : MonoBehaviour
 
     public float turnSpeed = 15f;
     Camera mainCamera;
-    
     private void FixedUpdate()
     {
         float yawCamera = mainCamera.transform.rotation.eulerAngles.y;

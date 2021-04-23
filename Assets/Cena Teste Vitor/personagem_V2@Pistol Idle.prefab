@@ -2027,7 +2027,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9173990594821444133}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a793e99eec73df94e8bff33524baaf01, type: 3}
   m_Name: 
@@ -2047,7 +2047,8 @@ MonoBehaviour:
   rigidPlayer: {fileID: 896606381995237806}
   StaminaCost: 0
   playerDown: 0
-  cam: {fileID: 0}
+  cam: {fileID: 3634452784956484136, guid: 413676939e5b01f45a4525be18268972, type: 3}
+  turnSpeed: 15
 --- !u!1 &9180932059886151232
 GameObject:
   m_ObjectHideFlags: 0
