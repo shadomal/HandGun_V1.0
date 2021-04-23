@@ -25,6 +25,7 @@ public class GameManager : SpawnPlayer
     public GameObject winUI;
     [Header("PLAYER ATRIBUTS")]
     private int playerLife, playerMaxLife, playerStamina;
+    public GameObject playerCam;
 
     [Header("ENEMY ATRIBUTS")]
     private int enemyLife, enemyMaxLife, enemyStamina;
@@ -36,7 +37,7 @@ public class GameManager : SpawnPlayer
     [Header("DICE CONTROLLER")]
     public static int dice_1, dice_2;
     public static bool buttonReady_1, buttonReady_2;
-    public Button Button_one, Button_two;
+    public Button Button_Right, Button_Left;
     public Text uiButtonText;
     public Text uiButtonText_two;
     public Text TimeToStart_txt;
@@ -50,21 +51,21 @@ public class GameManager : SpawnPlayer
     {
         this.turnos = 0;
         this.turnoTimer = 60f; //segundos
-
+        this.isRunning = false;
 
         buttonReady_1 = false;
         buttonReady_2 = false;
         timeToStart = 5;
         SetStateGame(STATE_GAME.INITIALIZING);
-        Button_one.onClick = new Button.ButtonClickedEvent();
-        Button_one.onClick.AddListener(() =>
+        Button_Right.onClick = new Button.ButtonClickedEvent();
+        Button_Right.onClick.AddListener(() =>
         {
             buttonReady_1 = !buttonReady_1;
             uiButtonText_two.text = buttonReady_1 ? "READY" : "UNREADY";
             CheckCanStart();
         });
-        Button_two.onClick = new Button.ButtonClickedEvent();
-        Button_two.onClick.AddListener(() =>
+        Button_Left.onClick = new Button.ButtonClickedEvent();
+        Button_Left.onClick.AddListener(() =>
         {
             buttonReady_2 = !buttonReady_2;
             uiButtonText.text = buttonReady_2 ? "READY" : "UNREADY";
@@ -109,43 +110,43 @@ public class GameManager : SpawnPlayer
                 SetStateGame(STATE_GAME.START_TURN);
                 if (GetStateGame() == STATE_GAME.START_TURN)
                 {
-                    UI_INICIALIZING_GAME.SetActive(false);
-                    UI_InGame.SetActive(true);
-                    CAM_INICIALIZE.SetActive(false);
-                    SetupBattle();
+                    LoadingPlayers();
                     return;
                 }
             }
             return;
         }
     }
-    public void SetupBattle()
+    public void LoadingPlayers()
     {
-        SetupSpawn();
-        player = GameObject.FindGameObjectWithTag("Player");
-        enemy = GameObject.FindGameObjectWithTag("Enemy");
-        SetPlayer(player, enemy);
-    }
-    public void SetPlayer(GameObject player, GameObject enemy)
-    {
-        //Jogador
-        userName_txt.text = "Lost";
-        //Inimigo
-        enemyName_txt.text = enemy.gameObject.GetComponent<Unit>().userName;
-
-        //Mudança de estado
-        SetStateGame(STATE_GAME.START_TURN);
-        InitTurn();
-    }
-    public void InitTurn()
-    {
-        Debug.Log("STATE -  " + stateGame);
-        if (this.GetStateGame() == STATE_GAME.START_TURN)
+        UI_INICIALIZING_GAME.SetActive(false);
+        UI_InGame.SetActive(true);
+        CAM_INICIALIZE.SetActive(false);
+        if (GetStateGame() == STATE_GAME.START_TURN)
         {
-            SetStateGame(STATE_GAME.PLAYER_TURN);
-            PlayerTurn();
+            SetupSpawn();
+            if (player != null && enemy != null)
+            {
+                userName_txt.text = "lost";
+                enemyName_txt.text = "pedrin";
+            }
+            if (dice_1 > dice_2)
+            {
+                Debug.Log("PLAYER WIN - RESULT IS: " + dice_1);
+                SetStateGame(STATE_GAME.PLAYER_TURN);                
+                PlayerTurn();
+                isRunning = true;
+            }
+            else
+            {
+                Debug.Log("BOT WIN - RESULT IS: " + dice_2);
+                SetStateGame(STATE_GAME.ENEMY_TURN);
+                EnemyTurn();
+                isRunning = true;
+            }
         }
     }
+
     public void CountTime()
     {
         if (isRunning || turnoTimer == 60)
@@ -167,12 +168,21 @@ public class GameManager : SpawnPlayer
     {
         if (this.GetStateGame() == STATE_GAME.PLAYER_TURN)
         {
-            PlayerController playerController = player.gameObject.GetComponent<PlayerController>();
-            if (playerController != null)
-            {
-                playerController.enabled = true;
-            }
+            player.GetComponent<PlayerController>().enabled = true;
+            playerCam.SetActive(true);
         }
+    }
+    public void EnemyTurn()
+    {
+        enemy.GetComponent<NavMeshAgent>().enabled = true;
+        if (this.GetStateGame() == STATE_GAME.ENEMY_TURN)
+        {
+            IsEnemyTurn();
+        }
+    }
+    public bool IsEnemyTurn()
+    {
+        return isTurn = true;
     }
     public void ChangePlayer(STATE_GAME state)
     {
@@ -188,19 +198,14 @@ public class GameManager : SpawnPlayer
             EnemyTurn();
         }
     }
-    public void EnemyTurn()
+    //Butão para a troca de turno do Player para o inimigo.
+    public void ResetGame()
     {
-        enemy.GetComponent<NavMeshAgent>().enabled = true;
-        if (this.GetStateGame() == STATE_GAME.ENEMY_TURN)
+        if (GetStateGame() == STATE_GAME.REBOOTING)
         {
-            IsEnemyTurn();
+            Debug.Log("Function on... plis reset game");
         }
     }
-    public bool IsEnemyTurn()
-    {
-        return isTurn = true;
-    }
-    //Butão para a troca de turno do Player para o inimigo.
     public void CheckPlayers()
     {
         if (player == null)
@@ -210,7 +215,8 @@ public class GameManager : SpawnPlayer
             turnos += 1;
             Destroy(this.enemy);
             this.turnoTimer = 60;
-            SetupBattle();
+            SetStateGame(STATE_GAME.REBOOTING);
+            ResetGame();
         }
         else if (enemy == null)
         {
@@ -230,7 +236,7 @@ public class GameManager : SpawnPlayer
                 if (GetStateGame() == STATE_GAME.PLAYER_TURN)
                 {
                     isPlayerAction = false;
-                    player.GetComponent<PlayerControl>().enabled = false;
+                    player.GetComponent<PlayerController>().enabled = false;
                     turnos += 1;
                     turnosCount.text = turnos.ToString();
                     ChangePlayer(STATE_GAME.ENEMY_TURN);

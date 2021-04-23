@@ -46,6 +46,13 @@ public class PlayerController : MonoBehaviour
         SightAnimation = GetComponent<Animator>();
         animator = GetComponent<Animator>();
         playerDown = false;
+
+
+
+
+        mainCamera = Camera.main;
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
     // Update is called once per frame
@@ -243,6 +250,15 @@ public class PlayerController : MonoBehaviour
     public bool IsGamePaused()
     {
         return Time.timeScale == 0;
+    }
+
+    public float turnSpeed = 15f;
+    Camera mainCamera;
+    
+    private void FixedUpdate()
+    {
+        float yawCamera = mainCamera.transform.rotation.eulerAngles.y;
+        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, yawCamera, 0), turnSpeed * Time.fixedDeltaTime);
     }
     void Update()
     {
