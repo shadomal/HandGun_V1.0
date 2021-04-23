@@ -29,6 +29,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Rigidbody rigidPlayer;
     [SerializeField] private float StaminaCost;
     public bool playerDown;
+    private float forceMult;
+
+    public float turnSpeed;
+    Camera mainCamera;
     #endregion
 
     // Start is called before the first frame update
@@ -36,25 +40,41 @@ public class PlayerController : MonoBehaviour
     {
         //life_ = GetComponent<Unit>().health;
         //maxLife_ = GetComponent<Unit>().maxHealth;
-        life_ = 150;
-        maxLife_ = 250;
-        speed = 20;
-        rigidPlayer = GetComponent<Rigidbody>();
-        stamina = 1000;
-        maxStamina = 10000;
-        StaminaCost = 0.8f;
-        SightAnimation = GetComponent<Animator>();
-        animator = GetComponent<Animator>();
-        playerDown = false;
+        this.life_ = 150;
+        this.maxLife_ = 250;
+        this.speed = 20;
+        this.rigidPlayer = GetComponent<Rigidbody>();
+        this.stamina = 1000;
+        this.maxStamina = 10000;
+        this.StaminaCost = 0.8f;
+        this.SightAnimation = GetComponent<Animator>();
+        this.animator = GetComponent<Animator>();
+        this.playerDown = false;
+        this.turnSpeed = 10f;
+        this.forceMult = 30;
 
-
-
-
-        mainCamera = Camera.main;
+        this.mainCamera = Camera.main;
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
     }
 
+    void Update()
+    {
+        float moveH = Input.GetAxis("Horizontal");
+        float moveV = Input.GetAxis("Vertical");
+        move(moveH, moveV);
+
+        if (Input.GetKeyDown(KeyCode.Mouse1))
+        {
+            SightActive();
+        }
+        Anim();
+    }
+    private void FixedUpdate()
+    {
+        float yawCamera = mainCamera.transform.rotation.eulerAngles.y;
+        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, yawCamera, 0), turnSpeed * Time.fixedDeltaTime);
+    }
     // Update is called once per frame
 
     #region Métodos         
@@ -98,9 +118,10 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        rigidPlayer.velocity = transform.forward * moveV * speed;
-        transform.Rotate(0, moveH * speed, 0);
+        //rigidPlayer.velocity = transform.forward * moveV * speed;
+        //transform.Rotate(0, moveH * speed, 0);
 
+        rigidPlayer.velocity = transform.forward * moveV * forceMult + transform.right * moveH * forceMult;
 
         animator.SetFloat("Blend X", moveH);
         animator.SetFloat("Blend Y", moveV);
@@ -250,25 +271,5 @@ public class PlayerController : MonoBehaviour
     public bool IsGamePaused()
     {
         return Time.timeScale == 0;
-    }
-
-    public float turnSpeed = 15f;
-    Camera mainCamera;
-    private void FixedUpdate()
-    {
-        float yawCamera = mainCamera.transform.rotation.eulerAngles.y;
-        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, yawCamera, 0), turnSpeed * Time.fixedDeltaTime);
-    }
-    void Update()
-    {
-        float moveH = Input.GetAxis("Horizontal");
-        float moveV = Input.GetAxis("Vertical");
-        move(moveH, moveV);
-
-        if (Input.GetKeyDown(KeyCode.Mouse1))
-        {
-            SightActive();
-        }
-        Anim();
     }
 }

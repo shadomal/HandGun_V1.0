@@ -7,31 +7,41 @@ public class AchaPlayer : MonoBehaviour
     public CinemachineFreeLook cam;
     public CinemachineVirtualCamera camVirtual;
 
-    public GameObject player;
+    private GameObject player;
+    public bool stopSearch;
     // Start is called before the first frame update
-    void Start()
+    void Aweke()
     {
-        
+        stopSearch = false;
     }
 
     // Update is called once per frame
     void Update()
     {
         find();
-        Debug.Log("CHAMANDO FIND");
     }
     public void find()
     {
         player = GameObject.FindGameObjectWithTag("Player");
-        if(player != null)
+        if (stopSearch == false)
         {
+
+            Transform obj = player.transform.GetChild(1);
+            stopSearch = true;
             Debug.Log("PLAYER ENCONTRADOR PELA CAMERA");
             camVirtual.m_Priority = 100;
- 
             cam.Follow = player.transform;
-            cam.LookAt = player.transform;
-        }
-        Debug.Log("Procurando player.....");
+            cam.LookAt = obj.transform;
 
+        }
+    }
+    public void camSet()
+    {
+        Transform obj = player.transform.GetChild(1);
+        stopSearch = false;
+        Debug.Log("PLAYER ENCONTRADOR PELA CAMERA");
+        camVirtual.m_Priority = 100;
+        cam.Follow = player.transform;
+        cam.LookAt = obj.transform;
     }
 }

@@ -34,6 +34,7 @@ public class GameManager : SpawnPlayer
 
     [Header("JOGADORES - ")]
     private GameObject player, enemy;
+    private GameObject playerClone, enemyClone;
 
     [Header("DICE CONTROLLER")]
     public static int dice_1, dice_2;
@@ -128,6 +129,8 @@ public class GameManager : SpawnPlayer
         if (GetStateGame() == STATE_GAME.START_TURN)
         {
             SetupSpawn();
+            playerClone = GameObject.FindGameObjectWithTag("Player");
+            enemyClone = GameObject.FindGameObjectWithTag("Enemy");
             if (player != null && enemy != null)
             {
                 userName_txt.text = "lost";
@@ -136,7 +139,7 @@ public class GameManager : SpawnPlayer
             if (dice_1 > dice_2)
             {
                 Debug.Log("PLAYER WIN - RESULT IS: " + dice_1);
-                SetStateGame(STATE_GAME.PLAYER_TURN);                
+                SetStateGame(STATE_GAME.PLAYER_TURN);
                 PlayerTurn();
                 isRunning = true;
             }
@@ -171,13 +174,13 @@ public class GameManager : SpawnPlayer
     {
         if (this.GetStateGame() == STATE_GAME.PLAYER_TURN)
         {
-            player.GetComponent<PlayerController>().enabled = true;
+            playerClone.GetComponent<PlayerController>().enabled = true;
             playerCam.SetActive(true);
         }
     }
     public void EnemyTurn()
     {
-        enemy.GetComponent<NavMeshAgent>().enabled = true;
+        enemyClone.GetComponent<NavMeshAgent>().enabled = true;
         if (this.GetStateGame() == STATE_GAME.ENEMY_TURN)
         {
             IsEnemyTurn();
