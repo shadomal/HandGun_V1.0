@@ -10,7 +10,6 @@ public class GameManager : SpawnPlayer
 
     [Header("Turno Vars")]
     public int turnos;
-    //public float turnoTimer;
     public static bool stop;
     public static bool turnoEnd;
     public static bool isPlayerAction, isEnemyAction;
@@ -49,7 +48,9 @@ public class GameManager : SpawnPlayer
     public GameObject CAM_INICIALIZE;
     public float timeToStart;
     public bool startCount;
-
+    [Header("GameVars")]
+    public int playerPontuacao, enemyPontuacao;
+    private bool IsPlayerDead, IsEnemyDead;
 
     void Awake()
     {
@@ -152,20 +153,25 @@ public class GameManager : SpawnPlayer
             }
         }
     }
-
+    public GameObject endTurn;
     public void CountTime()
     {
         if (isRunning || turnoTimer == 60)
         {
             turnoTimer -= Time.deltaTime;
             turnos_txt.text = turnoTimer.ToString("0");
-            if (turnoTimer <= 0)
+            if (turnoTimer <= 30)
             {
-                isRunning = false;
-                turnos += 1;
-                turnosCount.text = turnos.ToString();
-                Debug.Log("TURNOS QUE SE PASSARAM: " + turnos);
-                CheckPlayers();
+
+                if (turnoTimer <= 0)
+                {
+                    isRunning = false;
+                    turnos += 1;
+                    turnosCount.text = turnos.ToString();
+                    Debug.Log("TURNOS QUE SE PASSARAM: " + turnos);
+                    SearchPlayers();
+                    CheckPlayers();
+                }
             }
         }
     }
@@ -271,7 +277,6 @@ public class GameManager : SpawnPlayer
         turnoTimer = 0;
         ChangePlayer(STATE_GAME.PLAYER_TURN);
     }
-    public int playerPontuacao, enemyPontuacao;
 
     public void WinCondition()
     {
@@ -291,6 +296,37 @@ public class GameManager : SpawnPlayer
             winUI.SetActive(true);
             winner_txt.text = "VITORIA - " + enemyPontuacao + " " + enemyName_txt;
             win_img.fillAmount += Time.deltaTime;
+        }
+    }
+
+    public void SearchPlayers()
+    {
+        if (playerClone == null)
+        {
+            IsPlayerDead = true;
+            UpdateGameInfo();
+            SetStateGame(STATE_GAME.REBOOTING);
+        }
+        if (enemyClone == null)
+        {
+            IsEnemyDead = true;
+            SetStateGame(STATE_GAME.REBOOTING);
+
+        }
+
+        return;
+    }
+    public void OnClockEnd()
+    {
+
+    }
+    public void UpdateGameInfo()
+    {
+        if (IsPlayerDead)
+        {
+            turnos += 1;
+            this.enemyPoints_txt.text += 1.ToString();
+            turnosCount.text = turnos.ToString();
         }
     }
     void Update()

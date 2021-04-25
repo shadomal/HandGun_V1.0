@@ -6,8 +6,8 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/HomeMenu.unity
-    guid: 5979d78ce1fd15f418a1196a95ceb59c
+    path: Assets/Scenes/MenuNovo.unity
+    guid: c5ec41470dae5554e900e06e4f3d9ed9
   - enabled: 1
     path: Assets/Scenes/MapaBlocagem.unity
     guid: 283054ae31d0bfb439530dd0b4a71750
