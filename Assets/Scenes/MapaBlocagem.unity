@@ -5799,7 +5799,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 0
-    m_SensorSize: {x: 1.7790263, y: 1}
+    m_SensorSize: {x: 1.778626, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -8224,6 +8224,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_FillAmount
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5056075101039832645, guid: c404b4d9d6299584ca4c376386c8e4ff,
+        type: 3}
+      propertyPath: m_Name
+      value: Enemy Points
       objectReference: {fileID: 0}
     - target: {fileID: 5056075101069869329, guid: c404b4d9d6299584ca4c376386c8e4ff,
         type: 3}
@@ -17712,7 +17717,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 0
-    m_SensorSize: {x: 1.7790263, y: 1}
+    m_SensorSize: {x: 1.778626, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -19873,7 +19878,6 @@ MonoBehaviour:
   win_img: {fileID: 0}
   winner_txt: {fileID: 0}
   winUI: {fileID: 1398342827}
-  playerCam: {fileID: 0}
   Button_Right: {fileID: 731813251}
   Button_Left: {fileID: 366823725}
   uiButtonText: {fileID: 1588871470}
@@ -19888,6 +19892,8 @@ MonoBehaviour:
   startCount: 0
   playerPontuacao: 0
   enemyPontuacao: 0
+  endTurn: {fileID: 0}
+  inGame: 0
 --- !u!4 &1489482342
 Transform:
   m_ObjectHideFlags: 0
@@ -20124,11 +20130,11 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
-  far clip plane: 1000
-  field of view: 60
+  near clip plane: 0.1
+  far clip plane: 5000
+  field of view: 40
   orthographic: 0
-  orthographic size: 5
+  orthographic size: 10
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
@@ -20151,8 +20157,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1505901494}
-  m_LocalRotation: {x: -0.21627371, y: -0.42761493, z: 0.03293912, w: -0.8770896}
-  m_LocalPosition: {x: 410, y: 185, z: 611}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 6, y: -0.15, z: -8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -20217,7 +20223,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 0
-    m_SensorSize: {x: 1.7790263, y: 1}
+    m_SensorSize: {x: 1.778626, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -21387,7 +21393,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 1.7790263, y: 1}
+    m_SensorSize: {x: 1.778626, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -26145,7 +26151,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 0
-    m_SensorSize: {x: 1.7790263, y: 1}
+    m_SensorSize: {x: 1.778626, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0

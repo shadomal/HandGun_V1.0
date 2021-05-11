@@ -10,6 +10,7 @@ public class GameState : MonoBehaviour
         START_TURN, //Inicia primeiro turno
         PLAYER_TURN, // TURNO PLAYER
         ENEMY_TURN, // TURNO INIMIGO
+        RESET_ATRIBUTS,
         LOSE, //DERROTA DO INIMIGO
         STOP_TURN, // Para o turno
         REBOOTING, // ATUALIZAR A CENA(CONTADORES - PONTUAÇÃO, TURNOS RESTANTES - TEMPO, STAMINA E VIDA) 

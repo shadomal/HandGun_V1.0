@@ -6,5 +6,5 @@ public class EnumManager : GameState
 {
     public STATE_GAME state; 
     public STATE_GAME GetStateGame() => this.state;
-    public void SetStateGame(STATE_GAME actualyState) => this.state = actualyState;
+    public void SetStateGame(STATE_GAME actuallyState) => this.state = actuallyState;
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
+
 public class AchaPlayer : MonoBehaviour
 {
     public CinemachineFreeLook cam;
@@ -25,7 +26,7 @@ public class AchaPlayer : MonoBehaviour
         player = GameObject.FindGameObjectWithTag("Player");
         if (stopSearch == false)
         {
-
+            
             Transform obj = player.transform.GetChild(1);
             stopSearch = true;
             Debug.Log("PLAYER ENCONTRADOR PELA CAMERA");

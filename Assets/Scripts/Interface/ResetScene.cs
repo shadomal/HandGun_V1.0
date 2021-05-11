@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 public class ResetScene : MonoBehaviour
-{   
-    public void Reset() =>  SceneManager.LoadScene("MapaBlocagem");
+{
+    public void Reset() => SceneManager.LoadScene("MapaBlocagem");
+    
+    
 }

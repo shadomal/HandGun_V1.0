@@ -7,9 +7,9 @@ public class PlayerController : MonoBehaviour
 {
     #region Vars
     [Header("Vida e Estamina")]
-    [SerializeField] private int stamina;
+    private static int stamina;
     [SerializeField] private int maxStamina;
-    [SerializeField] private int life_;
+    private static int life_;
     [SerializeField] private int maxLife_;
     [Header("Animações")]
     [SerializeField] private Animator SightAnimation;
@@ -40,12 +40,12 @@ public class PlayerController : MonoBehaviour
     {
         //life_ = GetComponent<Unit>().health;
         //maxLife_ = GetComponent<Unit>().maxHealth;
-        this.life_ = 150;
+        life_ = 150;
         this.maxLife_ = 250;
         this.speed = 20;
         this.rigidPlayer = GetComponent<Rigidbody>();
-        this.stamina = 1000;
-        this.maxStamina = 10000;
+        stamina = 200;
+        this.maxStamina = 350;
         this.StaminaCost = 0.8f;
         this.SightAnimation = GetComponent<Animator>();
         this.animator = GetComponent<Animator>();
@@ -68,6 +68,11 @@ public class PlayerController : MonoBehaviour
         {
             SightActive();
         }
+        if (Input.GetKeyDown(KeyCode.X))
+        {
+            RemoveHealth(10);
+        }
+
         Anim();
     }
     private void FixedUpdate()
@@ -166,9 +171,9 @@ public class PlayerController : MonoBehaviour
     }
     #region Stamina
 
-    public bool isExhausted() => this.stamina <= 0;
+    public bool isExhausted() => stamina <= 0;
 
-    public int GetStamina() => this.stamina;
+    public int GetStamina() => stamina;
     public void SetStamina(int stamina)
     {
         if (IsGamePaused())
@@ -181,47 +186,45 @@ public class PlayerController : MonoBehaviour
         }
         CooldownManager.AddCooldown("shadomal", "stamina", 250);
 
-        this.stamina = stamina;
-
-        if (this.stamina > this.maxStamina)
+        if (stamina > this.maxStamina)
         {
-            this.stamina = this.maxStamina;
+            stamina = this.maxStamina;
         }
 
-        if (this.stamina <= 0)
+        if (stamina <= 0)
         {
-            this.stamina = 0;
+            stamina = 0;
         }
 
         //UpdateStaminaBar();
     }
 
-    public void AddStamina(int stamina)
+    /* public void AddStamina(int stamina)
     {
         this.SetStamina(this.GetStamina() + stamina);
-    }
+    }*/
+    public void AddStamina(int staminaIncrement) => this.SetStamina(stamina + staminaIncrement);
     public void RemoveStamina(int stamina)
     {
         this.SetStamina(this.GetStamina() - stamina);
     }
 
-
     public void UpdateStaminaBar()
     {
-        this.StaminaBar.fillAmount = ((1.6f / ((float)this.maxStamina)) * ((float)this.stamina));
+        this.StaminaBar.fillAmount = ((1.6f / ((float)this.maxStamina)) * ((float)stamina));
     }
     #endregion
     #region VIDA
-    public int GetLife() => this.life_;
-    public void SetLife(int LifePlayer)
+    public int GetLife() => life_;
+    public void SetLife(int increment)
     {
-        if (LifePlayer >= life_)
+        if (increment >= life_)
         {
-            this.life_ = maxLife_;
+            life_ = maxLife_;
         }
         else
         {
-            this.life_ = LifePlayer;
+            life_ = increment;
         }
         UpdateLifeBar();
         if (life_ <= 0)
@@ -230,9 +233,9 @@ public class PlayerController : MonoBehaviour
             DisableSight();
         }
     }
-    public void AddHealth(int life) => this.SetLife(this.life_ + life);
-    public void RemoveHealth(int life) => this.SetLife(this.life_ - life);
-    public void UpdateLifeBar() => this.LifeBar.fillAmount = ((1.6f / this.maxLife_) * this.life_);
+    public void AddHealth(int lifeIncrement) => this.SetLife(life_ + lifeIncrement);
+    public void RemoveHealth(int lifeReduced) => this.SetLife(life_ - lifeReduced);
+    public void UpdateLifeBar() => this.LifeBar.fillAmount = ((1.6f / this.maxLife_) * life_);
     public void DeathController()
     {
         Destroy(gameObject);

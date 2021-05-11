@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
-using UnityEngine.AI;
 using Cinemachine;
+using UnityEngine.AI;
+
 public class GameManager : SpawnPlayer
 {
 
@@ -23,12 +24,6 @@ public class GameManager : SpawnPlayer
     public Image win_img;
     public Text winner_txt;
     public GameObject winUI;
-    [Header("PLAYER ATRIBUTS")]
-    private int playerLife, playerMaxLife, playerStamina;
-    public GameObject playerCam;
-
-    [Header("ENEMY ATRIBUTS")]
-    private int enemyLife, enemyMaxLife, enemyStamina;
     public static bool isTurn = false;
 
     [Header("JOGADORES - ")]
@@ -37,7 +32,7 @@ public class GameManager : SpawnPlayer
 
     [Header("DICE CONTROLLER")]
     public static int dice_1, dice_2;
-    public static bool buttonReady_1, buttonReady_2;
+    [SerializeField] public static bool buttonReady_1, buttonReady_2;
     public Button Button_Right, Button_Left;
     public Text uiButtonText;
     public Text uiButtonText_two;
@@ -84,6 +79,7 @@ public class GameManager : SpawnPlayer
             if (buttonReady_1 == true && buttonReady_2 == true)
             {
                 RollingDices();
+                Debug.Log("Iniciando...");
             }
         }
     }
@@ -91,11 +87,12 @@ public class GameManager : SpawnPlayer
     {
         dice_1 = Random.Range(0, 20);
         dice_2 = Random.Range(0, 20);
-        Debug.Log("Rolling Dices this result is: " + dice_1 + " | " + dice_2);
+        Debug.Log("Rolling Dices this result is: " + " PLAYER 1:" + dice_1 + " | " + " ENEMY:" + dice_2);
         if (dice_1 == dice_2)
         {
             RollingDices();
-            Debug.Log("Rolling new dices this result is: " + dice_1 + " | " + dice_2);
+            Count();
+            Debug.Log("Rolling new dices this result is: " + " PLAYER 1:" + dice_1 + " | " + " ENEMY:" + dice_2);
             return;
         }
         playerDice.text = System.Convert.ToString(dice_1);
@@ -115,7 +112,9 @@ public class GameManager : SpawnPlayer
                 SetStateGame(STATE_GAME.START_TURN);
                 if (GetStateGame() == STATE_GAME.START_TURN)
                 {
+                    Debug.Log("LOADING PLAYERS.... - MENSAGE LINE: 120");
                     LoadingPlayers();
+                    inGame = true;
                     return;
                 }
             }
@@ -129,28 +128,41 @@ public class GameManager : SpawnPlayer
         CAM_INICIALIZE.SetActive(false);
         if (GetStateGame() == STATE_GAME.START_TURN)
         {
+            Debug.Log("STATE GAME: " + GetStateGame() + " - LINE MENSAGE - 136");
             SetupSpawn();
             playerClone = GameObject.FindGameObjectWithTag("Player");
             enemyClone = GameObject.FindGameObjectWithTag("Enemy");
-            if (player != null && enemy != null)
-            {
-                userName_txt.text = "lost";
-                enemyName_txt.text = "pedrin";
-            }
+
+            isRunning = true;
+
+            Debug.Log("Insert nick names... check Dice Results - LINE MENSAGE - 143");
+            userName_txt.text = "lost";
+            enemyName_txt.text = "pedrin";
+
             if (dice_1 > dice_2)
             {
                 Debug.Log("PLAYER WIN - RESULT IS: " + dice_1);
                 SetStateGame(STATE_GAME.PLAYER_TURN);
                 PlayerTurn();
-                isRunning = true;
             }
-            else
+            else if (dice_1 < dice_2)
             {
                 Debug.Log("BOT WIN - RESULT IS: " + dice_2);
                 SetStateGame(STATE_GAME.ENEMY_TURN);
                 EnemyTurn();
-                isRunning = true;
             }
+        }
+    }
+    static int playerHealth;
+    static int playerStamina;
+    public void RefreshStats()
+    {
+        if (inGame)
+        {
+            PlayerController states = playerClone.GetComponent<PlayerController>();
+            playerHealth = states.GetLife();
+            playerStamina = states.GetStamina();
+            Debug.Log("Player Health: " + playerHealth + " | " + "Player stamina: " + playerStamina);
         }
     }
     public GameObject endTurn;
@@ -181,7 +193,7 @@ public class GameManager : SpawnPlayer
         if (this.GetStateGame() == STATE_GAME.PLAYER_TURN)
         {
             playerClone.GetComponent<PlayerController>().enabled = true;
-            playerCam.SetActive(true);
+            //playerCam.SetActive(true);
         }
     }
     public void EnemyTurn()
@@ -298,28 +310,85 @@ public class GameManager : SpawnPlayer
             win_img.fillAmount += Time.deltaTime;
         }
     }
-
+    public bool inGame = false;
     public void SearchPlayers()
     {
-        if (playerClone == null)
+        if (inGame == true && Time.timeScale == 1)
         {
-            IsPlayerDead = true;
-            UpdateGameInfo();
+            inGame = false;
             SetStateGame(STATE_GAME.REBOOTING);
+            Debug.Log("Saindo de jogo... Resetando a cena... - STATUS ATUAL DO MANAGER - " + GetStateGame());
+            if (playerClone == null)
+            {
+                IsPlayerDead = true;
+                Debug.Log("Player Not found... REBOOTING SCENE...... - MESSAGE LINE - 315" + " " + GetStateGame());
+                RebotGame();
+            }
+            else
+            {
+                IsEnemyDead = true;
+                Debug.Log("Enemy Not found... REBOOTING SCENE...... - MESSAGE LINE - 321" + " " + GetStateGame());
+                RebotGame();
+            }
         }
-        if (enemyClone == null)
-        {
-            IsEnemyDead = true;
-            SetStateGame(STATE_GAME.REBOOTING);
-
-        }
-
         return;
     }
-    public void OnClockEnd()
+    bool rebotEnd;
+    public void RebotGame()
     {
+        Destroy(playerClone);
+        Destroy(enemyClone);
+        if (GetStateGame() == STATE_GAME.REBOOTING)
+        {
+            SetupSpawn();
+            playerClone = GameObject.FindGameObjectWithTag("Player");
+            enemyClone = GameObject.FindGameObjectWithTag("Enemy");
+            //RELOAD PLAYER ATRIBUTS
+            PlayerController status = playerClone.GetComponent<PlayerController>();
+            status.SetLife(250);
+            status.SetStamina(200);
 
+            enemyConfig enemyStatus = enemyClone.GetComponent<enemyConfig>();
+            enemyStatus.SetLife(250);
+            enemyStatus.SetStamina(200);
+
+            //RESET COUNT TIME;
+            turnoTimer = 60;
+
+            dice_1 = Random.Range(0, 20);
+            dice_2 = Random.Range(0, 20);
+            Debug.Log("Rolling Dices this result is: " + " PLAYER 1:" + dice_1 + " | " + " ENEMY:" + dice_2);
+            if (dice_1 == dice_2)
+            {
+                RollingDices();
+                Debug.Log("Rolling new dices this result is: " + " PLAYER 1:" + dice_1 + " | " + " ENEMY:" + dice_2);
+                return;
+            }
+            else
+            {
+                if (dice_1 > dice_2)
+                {
+                    Debug.Log("PLAYER WIN - RESULT IS: " + dice_1);
+                    SetStateGame(STATE_GAME.PLAYER_TURN);
+                    PlayerTurn();
+                }
+                else if (dice_1 < dice_2)
+                {
+                    Debug.Log("BOT WIN - RESULT IS: " + dice_2);
+                    SetStateGame(STATE_GAME.ENEMY_TURN);
+                    EnemyTurn();
+                }
+            }
+
+            /*Debug.Log("Reboot... Estado atual de jogo: " + GetStateGame() + "MENSAGE LINE: 343");
+            SetStateGame(STATE_GAME.START_TURN);
+            UpdateStatus();
+            LoadingPlayers();
+            */
+
+        }
     }
+
     public void UpdateGameInfo()
     {
         if (IsPlayerDead)
@@ -333,6 +402,9 @@ public class GameManager : SpawnPlayer
     {
         Count();
         CountTime();
+        SearchPlayers();
+        RefreshStats();
+
         if (Input.GetKey(KeyCode.K))
         {
             SkipTurn();
